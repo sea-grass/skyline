@@ -1,8 +1,8 @@
 const express = require('express');
-const pug = require('pug');
 const app = express();
+const pug = require('pug');
 
-const {DEBUG} = require('./settings');
+const {debug} = require('./debug');
 const {generateImageBuffer, generateGifBuffer} = require('./generate');
 
 

@@ -1,9 +1,11 @@
-const Jimp = require('jimp');
+const {debug} = require('./debug');
+const {DEBUG} = require('./settings');
+const Jimp = require('jimp/es').default;
 const {BitmapImage, GifFrame, GifUtil, GifCodec } = require("gifwrap");
-const DEBUG=  false;
 
 const width = 200;
 const height = 200;
+
 function generateImage() {
   const image = new Jimp(width, height, (err, image) => {
     if (err) throw err;
@@ -52,7 +54,9 @@ function generateImage() {
 
   return image;
 }
-function generateImageBuffer(DEBUG = false) {
+
+function generateImageBuffer() {
+  const Jimp = require('jimp/es').default;
   const image = generateImage();
 
   return new Promise((resolve, reject) => {
@@ -63,22 +67,27 @@ function generateImageBuffer(DEBUG = false) {
   });
 }
 
-function generateGifBuffer(DEBUG = false, num_frames = 1) {
-  return new Promise(async (resolve, reject) => {
-    const frames = [];
+function generateGifBuffer(num_frames = 1) {
+  try {
+    return new Promise(async (resolve, reject) => {
+      const frames = [];
 
-    for (let i = 0; i < 10; i++) {
-      const image = await generateImage();
-      const frame = new GifFrame(new BitmapImage(image.bitmap));
-      // To make the animation "slower" we just add it as multiple frames
-      frames.push(frame);
-      frames.push(frame);
-      frames.push(frame);
-    }
+      for (let i = 0; i < 10; i++) {
+        const image = await generateImage();
+        const frame = new GifFrame(new BitmapImage(image.bitmap));
+        // To make the animation "slower" we just add it as multiple frames
+        frames.push(frame);
+        frames.push(frame);
+        frames.push(frame);
+      }
 
-    const codec = new GifCodec();
-    resolve(codec.encodeGif(frames).then(gif => gif.buffer));
-  });
+      const codec = new GifCodec();
+      resolve(codec.encodeGif(frames).then(gif => gif.buffer));
+    });
+  } catch (e) {
+    debug(e.message);
+    return "";
+  }
 }
 
 module.exports = {
